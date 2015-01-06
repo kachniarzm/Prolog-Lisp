@@ -1,0 +1,140 @@
+;-----------------WYPISUJE MACIERZ-----------------------------------
+(defun printm(matrix) 
+	(dolist (row matrix) (print row))
+	(format t "~%") ;newline
+)
+
+
+;-----------------GETTER ZWRACA LISTÊ MACIERZY PO£O¯ON¥ POD list_ind-----------------------------------
+(defun nth_list(matrix list_ind)
+	(cond
+		((= (list-length list_ind) 0)
+			;single element
+			matrix
+		)
+		(t
+			;recursion
+			(nth_list (nth (first list_ind) matrix) (nthcdr 1 list_ind))
+		)
+	)
+)
+
+(defun set_list(matrix list_ind list_value)
+
+			(setf g (nth_list (nth (first list_ind) matrix) (nthcdr 1 list_ind)))
+			(loop for i from (-(list-length list_value) 1) downto 0 do
+			(setf (nth i g) (nth i list_value))
+			)
+)
+
+(defun ChangeRows(matrix list_ind1 list_ind2)
+(setf _from (nth_list matrix list_ind1))
+(setf _to (nth_list matrix list_ind2))
+(set_list matrix list_ind1 _to)
+(set_list matrix list_ind2 _from)
+)
+
+;-----------------WYPISUJE MACIERZ-----------------------------------
+(defun printm(matrix) 
+	(dolist (row matrix) (print row))
+	(format t "~%") ;newline
+)
+
+
+;-----------------GETTER ZWRACA LISTÊ MACIERZY PO£O¯ON¥ POD list_ind-----------------------------------
+(defun nth_list(matrix list_ind)
+	(cond
+		((= (list-length list_ind) 0)
+			;single element
+			matrix
+		)
+		(t
+			;recursion
+			(nth_list (nth (first list_ind) matrix) (nthcdr 1 list_ind))
+		)
+	)
+)
+
+
+
+(defun set_list(matrix list_ind list_value)
+
+			(setf g (nth_list (nth (first list_ind) matrix) (nthcdr 1 list_ind)))
+			(loop for i from (-(list-length list_value) 1) downto 0 do
+			(setf (nth i g) (nth i list_value))
+			)
+)
+
+(defun ChangeRows(matrix list_ind1 list_ind2)
+(setf _from (nth_list matrix list_ind1))
+(setf _to (nth_list matrix list_ind2))
+(setq tmp (copy-list _from))
+(set_list matrix list_ind1 _to)
+(set_list matrix list_ind2 tmp)
+)
+
+(defmacro macro_ChangeRows(matrix list_ind1 list_ind2)
+	`(cond
+	(t
+		(setf _from (macro_nth_list , matrix , list_ind1))
+		(setf _to (macro_nth_list , matrix , list_ind2))
+		(setq tmp (copy-list _from))
+		(macro_set_list , matrix , list_ind1 _to)
+		(macro_set_list , matrix , list_ind2 tmp)
+	)
+	)
+)
+
+(defmacro macro_nth_list(matrix list_ind)
+	`(cond
+		((= (list-length ,list_ind) 0)
+			;single element
+			,matrix
+		)
+		(t
+			;recursion
+			(nth_list (nth (first ,list_ind) ,matrix) (nthcdr 1 ,list_ind))
+		)
+	)
+)
+
+(defmacro macro_set_list(matrix list_ind list_value)
+	`(cond
+	(t
+		(setf g (nth_list (nth (first , list_ind) , matrix) (nthcdr 1 , list_ind)))
+		(let ((list_value_copy , list_value))
+			(loop for i from (-(list-length list_value_copy) 1) downto 0 do
+				(setf (nth i g) (nth i list_value_copy))
+			)
+		)
+	)
+	)
+)
+
+
+(print "---TESTY---")
+
+(setq  testMatrix '(((1 2) (3 4) (5 6))
+					((7 8) (9 10) (11 12))
+					((13 14) (15 16) (17 18))))
+	(setq  testMatrix2 '(((1 2) (3 4) (5 6))
+					((7 8) (9 10) (11 12))
+					((13 14) (15 16) (17 18))))
+(print "---Macierz testowa---")
+(printm testMatrix)
+(setq list1 '(0 1))
+(setq list2 '(2 0))
+(print "---Macierz testowa z zamienionymi wierszami [0 1] (czyli (3 4)) na [2 0] (czyli (13 14))---")
+(ChangeRows testMatrix list1 list2)
+(printm testMatrix)
+
+(print "-----------MAKRO---------")
+
+;(print (macroexpand-1 '(macro_ChangeRows testMatrix list1 list2)))
+
+;(printm (macro_nth_list testMatrix2 list1))
+;(macro_set_list testMatrix2 list1 '(123 321))
+
+;(printm (macro_nth_list (nth (first , list_ind) , matrix) (nthcdr 1 ,list_ind)))
+(macro_ChangeRows testMatrix2 list1 list2)
+(printm testMatrix2)

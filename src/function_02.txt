@@ -1,0 +1,71 @@
+;-----------------WYPISUJE MACIERZ-----------------------------------
+(defun printm(matrix) 
+	(dolist (row matrix) (print row))
+	(format t "~%") ;newline
+)
+
+;--------MNO¯ENIE MACIERZY PRZEZ SKALAR------------------------------
+
+(defun multiplyScalarMatrix(c _matrix)
+(cond
+	((or (null c) (null _matrix)) nil)
+	((and (numberp c) (numberp _matrix)) (* c _matrix))
+	(t 
+		(let ((result nil))
+		(loop for i from (- (list-length _matrix) 1) downto 0 do
+					(setq matrix_elem (nth i _matrix))
+					(setq result (append (list (multiplyScalarMatrix c matrix_elem)) result))
+				)
+		result
+		)
+	)
+)
+)
+
+;--------MNO¯ENIE MACIERZY PRZEZ SKALAR -MAKRO------------------------------
+
+(defmacro macro_multiplyScalarMatrix(c _matrix)
+`(cond
+	((or (null ,c) (null ,_matrix)) (print "nil 123"))
+	((and (numberp ,c) (numberp ,_matrix)) (* ,c ,_matrix))
+	(t 
+		(let ((result nil) (_matrix_copy , _matrix)) 
+			(loop for i from (- (list-length  _matrix_copy) 1) downto 0 do
+				(setq matrix_elem (nth i _matrix_copy))
+				(setq result (append (list (macro_multiplyScalarMatrix ,c matrix_elem)) result))
+			)
+			result
+			;(printm result)
+		)	
+	)
+)
+)
+
+(setq  matrix '((1 2 3)(4 5 6)(11 12 13)))
+(setq  matrix2 '((1 0 )(0 1)))
+(setq  matrix3 '((3 0 2 3)(10 1 5 6)))
+(setq  matrix5 '(((1 2 2) (1 7 2) (9 0 2) (1 0 0))((1 0 9) (-1 -2 2) (8 2 8) (4 5 2))))
+(setq  matrix4 12)
+
+(print "------------FUNKCJA------------")
+(print "macierz:")
+(printm matrix)
+(print "macierz * 10:")
+(printm (multiplyScalarMatrix 10 matrix))
+
+(print "macierz2:")
+(printm matrix2)
+(print "macierz2 * 2:")
+(printm (multiplyScalarMatrix 2 matrix2))
+
+(print "macierz3:")
+(printm matrix3)
+(print "macierz3 * -2:")
+(printm (multiplyScalarMatrix -2 matrix3))
+
+(print "------------MAKRO------------")
+(print "macierz5:")
+(printm matrix5)
+(print "macierz5 * -3")
+
+(printm (macro_multiplyScalarMatrix -3 matrix5))

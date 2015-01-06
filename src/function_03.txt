@@ -1,0 +1,151 @@
+;----ZASTOSUJ OPERATOR OP DO ODPOWIADAJ¥CYCH ELEMENTÓW LISTY--------
+;(a b c) * (d e f) -> (a*d b*e c*f)
+(defun op_lists(op q1 q2) ;(a b c) + (d e f) -> (a+d b+e c+f)
+	(if (not (and (null q1) (null q2)))
+		(if (and (numberp (first q1)) (numberp (first q2)))
+			(cons (apply op (list (first q1) (first q2))) (op_lists op (rest q1) (rest q2)))
+			(cons (list (first q1) op (first q2)) (op_lists op (rest q1) (rest q2)))
+		)
+	)
+)
+;---------------SUMA ELEMENTÓW LISTY--------------------
+;--------------(a b c d) -> a+b+c+d---------------------
+(defun sum_list(list1)    
+    (if (null list1)
+        0
+        (+ 
+            (first list1) 
+            (sum_list (rest list1))
+        )   
+    )   
+)
+;----MNO¯ENIE SKALARNE (ODPOWIADAJ¥CYCH POZYCJI WEKTORÓW)------
+;--------(a b c) * (d e f) -> (a*d b*e c*f)--------------------
+(defun scalar-multiply(l1 l2)
+	(sum_list (op_lists '*  l1 l2))
+)
+
+;-------------MNO¯ENIE WIERSZA * MACIERZ------------------------
+; row * matrix
+(defun rowfun(m1 m3)
+	(if (null m3)
+	   nil
+	   (cons (scalar-multiply m1 (first m3)) (rowfun m1 (rest m3)))
+	)
+)
+(defmacro macro_rowfun(m1 m3) ; row * matrix
+	`(if (not (null ,m3))
+		(cons (scalar-multiply ,m1 (first ,m3)) (macro_rowfun ,m1 (rest ,m3)))
+	)
+)
+
+;---------------MNO¯ENIE MACIERZY m1 x m2-------------------------
+(defun matrix-multiply(m1 m2)	   
+	   (if (null m1)
+		 nil
+		(cons (rowfun (first m1) m2)(matrix-multiply (rest m1) m2))
+		)		
+)
+
+(defmacro macro_matrix-multiply(m1 m2)	   
+	   `(if (null ,m1)
+		 nil
+		(cons (macro_rowfun (first ,m1) ,m2)(macro_matrix-multiply (rest ,m1) ,m2))
+		)		
+)
+
+;-----------------WYPISUJE MACIERZ-----------------------------------
+(defun printm(matrix) 
+	(dolist (row matrix) (print row))
+	(format t "~%") ;newline
+)
+
+;-----------------£¥CZENIE LIST PO ODPOWIADAJ¥CYCH ELEMENTACH--------
+;-----------------(a b c) + (d e f) -> ((a d)(b e)(c f))-------------
+(defun merge_lists(q1 q2)
+
+;zapewniamy ze oba parametry sa listami
+	
+	(if (not (listp q1))
+		
+  	    (setf q1 (list q1))
+
+	)	
+	(if (not (listp q2))
+
+	    (setf q2 (list q2))
+
+	)
+;zapewniamy ze pierwsze elementy obu parametrow sa listami
+	(if (not (listp (first q1)))
+	
+	    (setf (first q1) (list (first q1)))
+
+	)
+	(if (not (listp (first q2)))
+	
+	    (setf (first q2) (list (first q2)))
+
+	)
+;laczymy rekurencyjnie pierwsze elementy (listy) z q1 i q2
+
+	(if (not (and (null (first q1)) (null (first q2))))
+
+		(cons (append (first q1) (first q2)) (merge_lists (rest q1) (rest q2)))
+	)
+)
+(defun transpose(matrix)
+	(let ((result nil))
+		(dolist (row matrix result)
+			(setq result (merge_lists result (copy-list row)))
+		)
+	)
+)
+;funkcja mnozenia MACIERZY - przyjmuje wiele argumentów----------
+(defun matrix-mul(_matrix _matrices)
+(setq i 0)
+(setq result _matrix)
+(if (null _matrices)
+_matrix
+(loop
+		(setq _matrix2 (transpose (nth i _matrices)))
+			(setq result (matrix-multiply result _matrix2))
+		(if (= i (-(length _matrices) 1))	 (return "done"))	
+		(setq i (1+ i) ) )
+)
+result
+)
+
+(defmacro macro_matrix-mul(_matrix _matrices)
+`(setq i 0)
+(setq result _matrix)
+(if (null _matrices)
+_matrix
+(loop	
+	;(setq _matrix2 (transpose (nth i _matrices)))
+		;	(setq result (matrix-multiply result _matrix2))
+		(if (= i (-(length _matrices) 1))	 (return "done"))	
+		(setq i (+ i 1) ) 
+		)
+)
+result
+)
+
+(print "TEST MNO¯ENIE MACIERZY")
+(setq a1 '((1 0 0)(0 1 0)))
+(setq b1 '((2 1 1 0)(0 2 5 3)(2 3 4 -1)))
+(setq c1 '((0 3)(0 3)(0 2)(0 1)))
+
+(print "A1:")
+(printm a1)
+(print "B1:")
+(printm b1)
+(print "C1:")
+(printm c1)
+(print "MNO¯ENIE MACIERZY A1*B1*C1")
+(printm (matrix-mul a1 (list b1 c1)))
+(print(macroexpand-1 '(macro_matrix-mul a1 (list b1 c1))))
+;(printm (macro_matrix-mul a1 (list b1 c1)))
+(print "macro_matrix_mul")
+(print(macroexpand-1 '(macro_matrix-multiply a1 (transpose b1))))
+(print(macro_matrix-multiply a1 (transpose b1)))

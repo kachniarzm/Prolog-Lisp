@@ -1,0 +1,79 @@
+;-----------------WYPISUJE MACIERZ-----------------------------------
+(defun printm(matrix) 
+	(dolist (row matrix) (print row))
+	(format t "~%") ;newline
+)
+
+;-----------------£¥CZENIE LIST PO ODPOWIADAJ¥CYCH ELEMENTACH--------
+;-----------------(a b c) + (d e f) -> ((a d)(b e)(c f))-------------
+(defun merge_lists(q1 q2)
+
+;zapewniamy ze oba parametry sa listami
+	
+	(if (not (listp q1))
+		
+  	    (setf q1 (list q1))
+
+	)
+	
+	(if (not (listp q2))
+
+	    (setf q2 (list q2))
+
+	)
+	
+
+	
+;zapewniamy ze pierwsze elementy obu parametrow sa listami
+
+	(if (not (listp (first q1)))
+	
+	    (setf (first q1) (list (first q1)))
+
+	)
+	
+	(if (not (listp (first q2)))
+	
+	    (setf (first q2) (list (first q2)))
+
+	)
+	
+
+
+;laczymy rekurencyjnie pierwsze elementy (listy) z q1 i q2
+
+	(if (not (and (null (first q1)) (null (first q2))))
+
+		(cons (append (first q1) (first q2)) (merge_lists (rest q1) (rest q2)))
+
+	)
+
+)
+;-----------------TRANSPONUJE MACIERZ-----------------------------------
+(defun transpose(matrix)
+	(let ((result nil))
+		(dolist (row matrix result)
+			(setq result (merge_lists result (copy-list row)))
+		)
+	)
+)
+
+(defmacro macro_transpose(matrix)
+	`(let ((result ,nil))
+		(dolist (row ,matrix result)
+			(setq result (merge_lists result (copy-list row)))
+		)
+	)
+)
+
+
+(print "Transponowanie macierzy")
+(print "#######################")
+(setq matrix1 '((1 5)(2 4)))
+(print "Nasza macierz:")
+(printm matrix1)
+(print "Macierz transponowana (FUNKCJA):")
+(printm (transpose matrix1))
+
+(print "Macierz transponowana (MAKRO):")
+(printm (macro_transpose matrix1))

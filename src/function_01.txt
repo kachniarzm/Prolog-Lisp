@@ -1,0 +1,122 @@
+;drukuje macierz
+(defun printm(matrix)
+	(if (null matrix)
+		(format t "~%null")
+	)
+	(dolist (row matrix)
+		(print row)
+	)
+	(format t "~%") ;newline
+)
+
+;suma macierzy
+(defun sumMatrix(m1 m2)
+	(cond
+		;if
+		(
+			(and (null m1) (null m2))
+			nil
+		)
+		;else if
+		(
+			(or (null m1) (null m2))
+			(format t "~%Error: Matrices dimensions doesn't match")
+			nil
+		)
+		;else if
+		(
+			(and (atom m1) (atom m2))
+			(+ m1 m2)
+		)
+		;else if
+		(
+			(or (atom m1) (atom m2))
+			(format t "~%Error: Matrices dimensions doesn't match")
+			nil
+		)	
+		;else if
+		(
+			(not (= (list-length m1) (list-length m2)))
+			(format t "~%Error: Matrices dimensions doesn't match")
+			nil
+		)
+		;else
+		(
+			t ;always true
+			(let ((result ()))
+			(loop for i from (-(list-length m1) 1) downto 0 do
+				(setq m1_element (nth i m1))
+				(setq m2_element (nth i m2))
+				;(format t "~%m1_element:")
+				;(printm (list m1_element))
+				;(format t "~%m2_element:")
+				;(printm (list m2_element))
+				(setf result (append (list (sumMatrix m1_element m2_element)) result))
+				;(format t "~%result:")
+				;(printm (list result))
+			)
+			result
+			)
+		)
+	)
+)
+
+
+(defun sumManyMatrix(first_arg &rest other_arg)
+	(let ((result first_arg))
+		(loop for i from (-(list-length other_arg) 1) downto 0 do
+			(setq toAdd (nth i other_arg))
+			(setf result (sumMatrix result toAdd))
+		)
+	result
+	)
+)
+
+;testy
+(setq  a1 '(1 2 3 4 5))
+(setq  b1 '(10 20 30 40 50))
+(setq  c1 '((1 2 3)(4 5 6)(11 12 13)))
+(setq  d1 '((5 4 3)(2 1 0)(-1 -2 -3)))
+(setq  e1 '(((1 2)(3 4))((5 6)(7 8))))
+(setq  f1 '(((10 20)(30 40))((50 60)(70 80))))
+(setq  g1 '((100 200 300)(400 500 600)(700 800 900)))
+(setq  nullMatrix 'nil)
+
+(format t "~%A1:")
+(printm a1)
+(format t "~%B1:")
+(printm b1)
+(format t "~%C1:")
+(printm c1)
+(format t "~%D1:")
+(printm d1)
+(format t "~%E1:")
+(printm e1)
+(format t "~%F1:")
+(printm f1)
+(format t "~%nullMatrix:")
+(printm nullMatrix)
+
+(format t "~%nullMatrix + nullMatrix: expected null")
+(printm (sumMatrix nullMatrix nullMatrix))
+
+(format t "~%a1 + nullMatrix: expected error")
+(printm (sumMatrix a1 nullMatrix))
+
+(format t "~%a1 + c1: expected error")
+(printm (sumMatrix a1 c1))
+
+(format t "~%c1 + e1: expected error")
+(printm (sumMatrix c1 e1))
+
+(format t "~%a1 + b1: expected (11 22 33 ...)")
+(printm (sumMatrix a1 b1))
+
+(format t "~%c1 + d1: expected (6 6 6) ...")
+(printm (sumMatrix c1 d1))
+
+(format t "~%e1 + f1: expected (11 22)(33 44) ...")
+(printm (sumMatrix e1 f1))
+
+(format t "~%c1 + d1 + g1: expected (106 206 306) ...")
+(printm (sumManyMatrix c1 d1 g1))

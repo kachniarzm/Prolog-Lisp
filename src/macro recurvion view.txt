@@ -1,0 +1,18 @@
+(defmacro macro_decrement (x) `(cond
+		(
+			(= 0 , x)
+			(print 'koniec)
+			nil
+		)
+		(
+			t
+			(print 'zmniejszamy)
+			(print , x)
+			(macro_decrement (- ,x 1))
+		)
+	) )
+	
+(print "Output:")
+(macro_decrement 3)
+(print "Marco:")
+(print (trace (macro_decrement 3)))

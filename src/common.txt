@@ -1,0 +1,65 @@
+;-----------------WYPISUJE MACIERZ-----------------------------------
+(defun printm(matrix) 
+	(dolist (row matrix) (print row))
+	(format t "~%") ;newline
+)
+;sposób wywo³ania:
+;(printm m3)
+
+
+;-----------------£¥CZENIE LIST PO ODPOWIADAJ¥CYCH ELEMENTACH--------
+;-----------------(a b c) + (d e f) -> ((a d)(b e)(c f))-------------
+(defun merge_lists(q1 q2)
+
+;zapewniamy ze oba parametry sa listami
+	
+	(if (not (listp q1))
+		
+  	    (setf q1 (list q1))
+
+	)
+	
+	(if (not (listp q2))
+
+	    (setf q2 (list q2))
+
+	)
+	
+
+	
+;zapewniamy ze pierwsze elementy obu parametrow sa listami
+
+	(if (not (listp (first q1)))
+	
+	    (setf (first q1) (list (first q1)))
+
+	)
+	
+	(if (not (listp (first q2)))
+	
+	    (setf (first q2) (list (first q2)))
+
+	)
+	
+
+
+;laczymy rekurencyjnie pierwsze elementy (listy) z q1 i q2
+
+	(if (not (and (null (first q1)) (null (first q2))))
+
+		(cons (append (first q1) (first q2)) (merge_lists (rest q1) (rest q2)))
+
+	)
+
+)
+
+
+;-----------------TWORZENIE MACIERZY---------------------------------
+(setq m1 '(1 2 3 4))
+(setq m2 '((1 0)(0 1)))
+(setq m3 '((2 5)(3 7)))
+(setq m4 '((2 5)(3 4)(2 1)))
+(setq m5 '((3 6 4)(1 2 5)(3 2 3)))
+(setq m6 '((1 2 3 4)(5 6 7 8)))
+(setq m7 '((0 1 -2 1)(2 4 5 9)))
+(setq m8 '((0 1 -2 1)(2 4 5 9)(0 5 7 8)(8 4 6 5)))
